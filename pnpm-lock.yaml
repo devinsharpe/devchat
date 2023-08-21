@@ -23,6 +23,9 @@ dependencies:
   '@trpc/server':
     specifier: ^10.34.0
     version: 10.34.0
+  lucide-react:
+    specifier: ^0.268.0
+    version: 0.268.0(react@18.2.0)
   next:
     specifier: ^13.4.2
     version: 13.4.2(react-dom@18.2.0)(react@18.2.0)
@@ -40,6 +43,9 @@ dependencies:
     version: 3.21.4
 
 devDependencies:
+  '@tailwindcss/forms':
+    specifier: ^0.5.4
+    version: 0.5.4(tailwindcss@3.3.3)
   '@types/eslint':
     specifier: ^8.37.0
     version: 8.37.0
@@ -334,6 +340,15 @@ packages:
       typescript: 5.0.4
       zod: 3.21.4
     dev: false
+
+  /@tailwindcss/forms@0.5.4(tailwindcss@3.3.3):
+    resolution: {integrity: sha512-YAm12D3R7/9Mh4jFbYSMnsd6jG++8KxogWgqs7hbdo/86aWjjlIEvL7+QYdVELmAI0InXTpZqFIg5e7aDVWI2Q==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || >= 3.0.0-alpha.1'
+    dependencies:
+      mini-svg-data-uri: 1.4.4
+      tailwindcss: 3.3.3
+    dev: true
 
   /@tanstack/query-core@4.29.25:
     resolution: {integrity: sha512-DI4y4VC6Uw4wlTpOocEXDky69xeOScME1ezLKsj+hOk7DguC9fkqXtp6Hn39BVb9y0b5IBrY67q6kIX623Zj4Q==}
@@ -2047,6 +2062,14 @@ packages:
       yallist: 4.0.0
     dev: true
 
+  /lucide-react@0.268.0(react@18.2.0):
+    resolution: {integrity: sha512-XP/xY3ASJAViqNqVnDRcEfdxfRB7uNST8sqTLwZhL983ikmHMQ7qQak7ZxrnXOVhB3QDBawdr3ANq0P+iWHP/g==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+    dev: false
+
   /merge2@1.4.1:
     resolution: {integrity: sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==}
     engines: {node: '>= 8'}
@@ -2058,6 +2081,11 @@ packages:
     dependencies:
       braces: 3.0.2
       picomatch: 2.3.1
+    dev: true
+
+  /mini-svg-data-uri@1.4.4:
+    resolution: {integrity: sha512-r9deDe9p5FJUPZAk3A59wGH7Ii9YrjjWw0jmw/liSbHl2CHiyXj6FcDXDu2K3TjVAXqiJdaw3xxwlZZr9E6nHg==}
+    hasBin: true
     dev: true
 
   /minimatch@3.1.2:
