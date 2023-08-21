@@ -8,6 +8,12 @@ export const env = createEnv({
    */
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]),
+    // Database Settings
+    MIGRATE_URL: z.string().url(),
+    PGDATABASE: z.string(),
+    PGHOST: z.string(),
+    PGPASSWORD: z.string(),
+    PGUSER: z.string(),
   },
 
   /**
@@ -25,6 +31,12 @@ export const env = createEnv({
    */
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
+    // Database Settings
+    MIGRATE_URL: process.env.MIGRATE_URL,
+    PGDATABASE: process.env.PGDATABASE,
+    PGHOST: process.env.PGHOST,
+    PGPASSWORD: process.env.PGPASSWORD,
+    PGUSER: process.env.PGUSER,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
