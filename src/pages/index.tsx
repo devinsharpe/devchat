@@ -27,7 +27,7 @@ export default function Home() {
               <Bot />
             </div>
             <h1 className="rounded-r-full rounded-bl-full bg-zinc-800 px-6 py-4 shadow-lg">
-              I'm LLaMA, an AI assistant developed by Meta AI that can
+              I&apos;m LLaMA, an AI assistant developed by Meta AI that can
               understand and respond to human input in a conversational manner.
             </h1>
           </div>
