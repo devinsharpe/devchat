@@ -10,4 +10,7 @@ export default schema;
 
 // App Schema Exports
 
+export const conversations = appSchema.conversations;
+export const exchanges = appSchema.exchanges;
+
 // Enum Schema Exports
