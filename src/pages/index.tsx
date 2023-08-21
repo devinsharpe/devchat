@@ -1,9 +1,9 @@
 import Head from "next/head";
-import { api } from "~/utils/api";
-import { Bot, Cog } from "lucide-react";
+// import { api } from "~/utils/api";
+import { Bot, Cog, Send } from "lucide-react";
 
 export default function Home() {
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
+  // const hello = api.example.hello.useQuery({ text: "from tRPC" });
 
   return (
     <>
@@ -33,8 +33,9 @@ export default function Home() {
           </div>
         </div>
         <div className="flex flex-col items-center gap-4">
-          <button className="rounded-xl bg-gradient-to-br from-pink-200 via-purple-300 to-indigo-300 px-6 py-3 font-semibold text-zinc-800 transition-transform duration-150 hover:scale-105">
-            Send a Message
+          <button className="flex items-center gap-2 rounded-xl bg-gradient-to-br from-pink-200 via-purple-300 to-indigo-300 px-6 py-3 font-semibold text-zinc-800 transition-transform duration-150 hover:scale-105">
+            <span>Send a Message</span>
+            <Send />
           </button>
           <button className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-zinc-200 via-zinc-400 to-zinc-500 px-4 py-2 text-sm font-semibold text-zinc-800 transition-transform duration-150 hover:scale-105">
             <Cog />
