@@ -14,6 +14,9 @@ export const env = createEnv({
     PGHOST: z.string(),
     PGPASSWORD: z.string(),
     PGUSER: z.string(),
+    // Replicate Settings
+    REPLICATE_TOKEN: z.string(),
+    LLAMA_VERSION_ID: z.string(),
   },
 
   /**
@@ -37,6 +40,9 @@ export const env = createEnv({
     PGHOST: process.env.PGHOST,
     PGPASSWORD: process.env.PGPASSWORD,
     PGUSER: process.env.PGUSER,
+    // Replicate Settings
+    REPLICATE_TOKEN: process.env.REPLICATE_TOKEN,
+    LLAMA_VERSION_ID: process.env.LLAMA_VERSION_ID,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
