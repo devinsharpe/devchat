@@ -23,6 +23,9 @@ const conversations = pgTable("conversations", {
   id: varchar("id", idConfig).primaryKey().notNull(),
   title: varchar("title").notNull(),
   systemMessage: varchar("systemMessage"),
+  temperature: smallint("temperature").default(75),
+  maxNewTokens: smallint("maxNewTokens").default(500),
+  minNewTokens: smallint("minNewTokens").default(-1),
   promptCount: smallint("promptCount"),
   createdAt: timestamp("createdAt", {
     withTimezone: true,
