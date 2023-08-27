@@ -8,17 +8,6 @@ import {
 import { idConfig } from "../utils";
 import { type InferModel, relations } from "drizzle-orm";
 
-// Conversation
-//
-// id
-// title
-// sys message
-// prompt count
-// created at
-// updated at
-//
-//
-
 const conversations = pgTable("conversations", {
   id: varchar("id", idConfig).primaryKey().notNull(),
   title: varchar("title").notNull(),
@@ -42,23 +31,18 @@ const conversationRelations = relations(conversations, ({ many }) => ({
 export type Conversation = InferModel<typeof conversations, "select">;
 export type NewConversation = InferModel<typeof conversations, "insert">;
 
-// exchange
-//
-// id
-// prompt
-// response
-// time elapsed
-// createdAt
-// conversationId
-
 const exchanges = pgTable("exchanges", {
   id: varchar("id", idConfig).primaryKey().notNull(),
   prompt: varchar("prompt").notNull(),
-  reponse: varchar("response").notNull(),
+  response: varchar("response").notNull(),
   timeElapsed: smallint("timeElapsed").notNull(),
   conversationId: varchar("conversationId", idConfig)
     .notNull()
     .references((): AnyPgColumn => conversations.id),
+  createdAt: timestamp("createdAt", {
+    withTimezone: true,
+    mode: "string",
+  }).defaultNow(),
 });
 const exchangeRelations = relations(exchanges, ({ one }) => ({
   conversation: one(conversations, {
@@ -69,13 +53,14 @@ const exchangeRelations = relations(exchanges, ({ one }) => ({
 export type Exchange = InferModel<typeof exchanges, "select">;
 export type NewExchange = InferModel<typeof exchanges, "insert">;
 
-const schema = {
-  conversations,
-  exchanges,
-};
 export const relationSchema = {
   conversations: conversationRelations,
   exchanges: exchangeRelations,
+};
+
+const schema = {
+  conversations,
+  exchanges,
 };
 
 export default schema;
