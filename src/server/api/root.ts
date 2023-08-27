@@ -1,5 +1,6 @@
 import { exampleRouter } from "~/server/api/routers/example";
 import { createTRPCRouter } from "~/server/api/trpc";
+import { conversationsRouter } from "./routers/conversations";
 import { predictionsRouter } from "./routers/predictions";
 
 /**
@@ -9,6 +10,7 @@ import { predictionsRouter } from "./routers/predictions";
  */
 export const appRouter = createTRPCRouter({
   example: exampleRouter,
+  conversations: conversationsRouter,
   predictions: predictionsRouter,
 });
 
