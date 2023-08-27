@@ -36,7 +36,7 @@ const exchanges = pgTable("exchanges", {
   id: varchar("id", idConfig).primaryKey().notNull(),
   prompt: varchar("prompt").notNull(),
   response: varchar("response").notNull(),
-  timeElapsed: smallint("timeElapsed").notNull(),
+  timeElapsed: real("timeElapsed").notNull(),
   conversationId: varchar("conversationId", idConfig)
     .notNull()
     .references((): AnyPgColumn => conversations.id),
