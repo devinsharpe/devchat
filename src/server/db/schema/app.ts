@@ -1,18 +1,19 @@
+import { relations, type InferModel } from "drizzle-orm";
 import {
-  type AnyPgColumn,
+  real,
   pgTable,
   smallint,
   timestamp,
   varchar,
+  type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 import { idConfig } from "../utils";
-import { type InferModel, relations } from "drizzle-orm";
 
 const conversations = pgTable("conversations", {
   id: varchar("id", idConfig).primaryKey().notNull(),
   title: varchar("title").notNull(),
   systemMessage: varchar("systemMessage"),
-  temperature: smallint("temperature").default(75),
+  temperature: real("temperature").default(0.75),
   maxNewTokens: smallint("maxNewTokens").default(500),
   minNewTokens: smallint("minNewTokens").default(-1),
   promptCount: smallint("promptCount"),
