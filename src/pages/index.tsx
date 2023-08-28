@@ -1,20 +1,12 @@
-import { api } from "~/utils/api";
-import { Cog, MessagesSquare, List } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { Cog, MessagesSquare } from "lucide-react";
 import ChatDialog from "~/components/chatDialog";
 import Modal from "~/components/modal";
-import ChatOptionsForms, {
-  type ChatOptions,
-} from "~/components/forms/chatOptions";
 import { useRouter } from "next/router";
-
-const HOME_PROMPTS = [
-  "Hi! Who are you?",
-  "Yeehaw! How are you and ol' bessy?",
-  "Hi LLaMA 2, who created you?",
-  "Hey, can you tell me a good dad joke?",
-  "I would love some background music right now. Do you have a couple of song recommendations?",
-];
+import TopNav from "~/components/topNav";
+import useClientside from "~/hooks/useClientside";
+import ChatOptionsForm from "~/components/forms/chatOptions";
+import useConversationOptions from "~/hooks/useConversationOptions";
+import useHomePrediction from "~/hooks/useHomePrediction";
 
 // Create Conversation flow ✅
 // - Additional options (system prompt, etc.) ✅
@@ -31,83 +23,26 @@ const HOME_PROMPTS = [
 // Clean up var/key names for consistency (message -> prompt, systemMessage -> systemPrompt, etc.)
 
 export default function Home() {
-  // const hello = api.example.hello.useQuery({ text: "from tRPC" });
-  const [index] = useState(Math.floor(Math.random() * 5));
-  const [isClient, setIsClient] = useState(false);
-  const homePrediction = api.predictions.homePrediction.useQuery({ index });
-  const createConversation = api.conversations.create.useMutation();
-  const [conversationOptions, setConversationOptions] = useState<ChatOptions>({
-    message: "",
-    systemPrompt: "",
-    temperature: 0.75,
-    maxNewTokens: 500,
-    minNewTokens: -1,
-  });
-  const [isNewMessageModalOpen, setIsNewMessageModalOpen] = useState(false);
-  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
-  const [history, setHistory] = useState<
-    {
-      isLoading: boolean;
-      sender: "user" | "bot";
-      messages: string[];
-    }[]
-  >([
-    {
-      isLoading: false,
-      sender: "user",
-      messages: HOME_PROMPTS[index]!.split("! "),
-    },
-    {
-      isLoading: true,
-      sender: "bot",
-      messages: [],
-    },
-  ]);
   const router = useRouter();
-
-  const handleMessageSend = useCallback(async () => {
-    if (conversationOptions.message) {
-      const res = await createConversation.mutateAsync({
-        prompt: conversationOptions.message,
-        system_prompt: conversationOptions.systemPrompt,
-        temperature: conversationOptions.temperature,
-        max_new_tokens: conversationOptions.maxNewTokens,
-        min_new_tokens: conversationOptions.minNewTokens,
-      });
-      const storedConversations = JSON.parse(
-        localStorage.getItem("previousConversations") ?? "[]"
-      ) as string[];
-      storedConversations.push(res.conversation.id);
-      await router.push(`/chat/${res.conversation.id}`);
-    }
-    console.log("missing initial message");
-  }, [conversationOptions, createConversation, router]);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (homePrediction.data) {
-      setHistory([
-        {
-          isLoading: false,
-          sender: "user",
-          messages: HOME_PROMPTS[index]!.split("! "),
-        },
-        {
-          isLoading: false,
-          sender: "bot",
-          messages: homePrediction.data.split("! "),
-        },
-      ]);
-    }
-  }, [homePrediction, setHistory, index]);
+  const { isClient } = useClientside();
+  const {
+    createConversation,
+    conversationOptions,
+    setConversationOptions,
+    isNewMessageModalOpen,
+    setIsNewMessageModalOpen,
+    showAdvancedOptions,
+    setShowAdvancedOptions,
+    handleMessageSend,
+  } = useConversationOptions(router);
+  const { history } = useHomePrediction();
 
   return (
     <>
+      <TopNav title="DevChat" />
+
       {isClient && (
-        <section className="flex h-full w-full max-w-2xl flex-col gap-2 overflow-y-auto px-2 pb-16 pt-4">
+        <section className="flex h-full w-full max-w-2xl flex-col gap-2 overflow-y-auto px-2 py-16 ">
           {history.map((history, index) => (
             <ChatDialog
               dialogIndex={index}
@@ -132,10 +67,6 @@ export default function Home() {
           <span>Start a Chat</span>
           <MessagesSquare />
         </button>
-        <button className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-200 via-red-200 to-yellow-100 bg-size-200 bg-pos-0 px-4 py-2 text-sm font-semibold text-zinc-800 transition-all duration-500 hover:scale-105 hover:bg-pos-100">
-          <List />
-          <span className="sr-only">View Previous Conversations</span>
-        </button>
         <button
           className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-zinc-200 via-zinc-200 to-zinc-400 bg-size-200 bg-pos-0 px-4 py-2 text-sm font-semibold text-zinc-800 transition-all duration-500 hover:scale-105 hover:bg-pos-100"
           onClick={() => {
@@ -153,7 +84,7 @@ export default function Home() {
         onOpenChange={() => setIsNewMessageModalOpen(!isNewMessageModalOpen)}
         title="Start a Chat"
       >
-        <ChatOptionsForms
+        <ChatOptionsForm
           isLoading={createConversation.isLoading}
           options={conversationOptions}
           onChange={(opts) =>

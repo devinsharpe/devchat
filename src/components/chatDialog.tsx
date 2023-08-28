@@ -13,7 +13,7 @@ function ChatMessage({ isBot, isUser, index, message }: ChatMessageProps) {
     <div
       className={cn(
         "flex w-full items-start gap-3",
-        isUser ? "justify-end" : ""
+        isUser ? "justify-end pl-2" : "pr-2"
       )}
     >
       <BotAvatar className={index !== 0 ? "invisible" : ""} isVisible={isBot} />

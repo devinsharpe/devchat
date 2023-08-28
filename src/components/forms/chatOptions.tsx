@@ -19,7 +19,7 @@ interface ChatOptionsFormProps {
   onSubmit: () => void | Promise<void>;
 }
 
-function ChatOptionsForms({
+function ChatOptionsForm({
   isLoading,
   options,
   showAdvancedOptions,
@@ -149,4 +149,4 @@ function ChatOptionsForms({
   );
 }
 
-export default ChatOptionsForms;
+export default ChatOptionsForm;
