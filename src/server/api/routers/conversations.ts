@@ -1,9 +1,15 @@
 import { TRPCError } from "@trpc/server";
-import { desc, eq } from "drizzle-orm";
+import { asc, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { conversations, exchanges } from "~/server/db/schema";
 import { createId } from "~/server/db/utils";
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import { type Exchange } from "~/server/db/schema/app";
+import {
+  TITLE_SUMMARY_SYS_PROMPT,
+  buildPromptHistory,
+  convertConversationToPromptInput,
+} from "~/server/ml";
 
 export const conversationsRouter = createTRPCRouter({
   create: publicProcedure
@@ -17,7 +23,6 @@ export const conversationsRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      console.log(input);
       const conversation = await ctx.db
         .insert(conversations)
         .values({
@@ -40,25 +45,79 @@ export const conversationsRouter = createTRPCRouter({
         conversationId: conversation.id,
       });
       const titleRes = await ctx.ml.runPrediction({
-        prompt: `**user** ${input.prompt} **bot** ${res.response}`,
-        system_prompt:
-          "You are a helpful bot dedicated to summarizing conversations into a simple title that covers both sides of the conversation. Please summarize the provided conversations in 15 words or │ess. The conversations with be provided in the following format: **user** [[query]] **bot** [[response]]",
+        prompt: `
+        --- ${conversation.id} ---
+        [[user]] ${input.prompt}
+        [[bot]] ${res.response}
+        `,
+        system_prompt: TITLE_SUMMARY_SYS_PROMPT,
       });
-      await ctx.db.update(conversations).set({
-        title: titleRes.response,
-      });
+      await ctx.db
+        .update(conversations)
+        .set({
+          title: titleRes.response,
+        })
+        .where(eq(conversations.id, conversation.id));
       return {
         conversation,
         exchanges: [exchange],
       };
     }),
-  get: publicProcedure
+  exchange: publicProcedure
     .input(
       z.object({
         id: z.string(),
+        prompt: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const conversation = await ctx.db
+        .select()
+        .from(conversations)
+        .where(eq(conversations.id, input.id))
+        .then((conv) => conv[0] ?? null);
+      if (!conversation)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Message not found",
+        });
+      const exchangeList = await ctx.db
+        .select()
+        .from(exchanges)
+        .where(eq(exchanges.conversationId, conversation.id))
+        .orderBy(asc(exchanges.createdAt));
+      const res = await ctx.ml.runPrediction({
+        ...convertConversationToPromptInput(conversation),
+        prompt: buildPromptHistory(exchangeList, input.prompt),
+      });
+      const exchange = await ctx.db
+        .insert(exchanges)
+        .values({
+          id: createId(),
+          prompt: input.prompt,
+          response: res.response,
+          timeElapsed: res.timeElapsed,
+          conversationId: conversation.id,
+        })
+        .returning()
+        .then((exchange) => exchange[0] ?? null);
+      await ctx.db.update(conversations).set({
+        promptCount: conversation.promptCount ?? 0 + 1,
+      });
+      return exchange;
+    }),
+  get: publicProcedure
+    .input(
+      z.object({
+        id: z.string().optional(),
       })
     )
     .query(async ({ ctx, input }) => {
+      if (!input.id)
+        return {
+          conversation: null,
+          exchanges: [] as Exchange[],
+        };
       const conversation = await ctx.db
         .select()
         .from(conversations)
@@ -71,9 +130,9 @@ export const conversationsRouter = createTRPCRouter({
         });
       const exchangeList = await ctx.db
         .select()
-        .from(conversations)
+        .from(exchanges)
         .where(eq(exchanges.conversationId, conversation.id))
-        .orderBy(desc(exchanges.createdAt));
+        .orderBy(asc(exchanges.createdAt));
       return {
         conversation,
         exchanges: exchangeList,

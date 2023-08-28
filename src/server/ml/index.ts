@@ -1,5 +1,6 @@
 import { env } from "~/env.mjs";
 import Replicate from "replicate";
+import { Conversation, Exchange } from "../db/schema/app";
 
 type MODEL = "`${string}/${string}:${string}`";
 export const PREDICTION_MODEL =
@@ -17,7 +18,7 @@ export const TITLE_SUMMARY_SYS_PROMPT = `
   [[user]] **user query**
   [[bot]] **bot response**
 
-  Please provide the summary in the following format:
+  Provide the summary in the following format:
 
   [[ID]] **response**
   `;
@@ -25,6 +26,27 @@ export const TITLE_SUMMARY_SYS_PROMPT = `
 export const replicate = new Replicate({
   auth: env.REPLICATE_TOKEN,
 });
+
+export function convertConversationToPromptInput(conversation: Conversation) {
+  return {
+    system_prompt: conversation.systemMessage ?? "",
+    max_new_tokens: conversation.maxNewTokens ?? 500,
+    min_new_tokens: conversation.minNewTokens ?? -1,
+    temperature: conversation.temperature ?? 0.75,
+  };
+}
+
+export function buildPromptHistory(exchanges: Exchange[], prompt?: string) {
+  return exchanges.reduce(
+    (acc: string, curr: Exchange) =>
+      `${acc}
+      [INST] ${curr.prompt} [/INST]
+      ${curr.response}
+      ${prompt ? "[INST] " + prompt + " [/INST]" : ""}
+    `,
+    ""
+  );
+}
 
 export const runPrediction = async (input: {
   prompt: string;
