@@ -12,6 +12,7 @@ import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import db from "../db";
+import kv from "../kv";
 import { replicate, runPrediction } from "../ml";
 
 /**
@@ -37,6 +38,7 @@ type CreateContextOptions = Record<string, never>;
 const createInnerTRPCContext = (_opts: CreateContextOptions) => {
   return {
     db,
+    kv,
     ml: {
       replicate,
       runPrediction,
