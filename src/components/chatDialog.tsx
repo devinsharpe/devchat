@@ -12,7 +12,7 @@ function ChatMessage({ isBot, isUser, index, message }: ChatMessageProps) {
   return (
     <div
       className={cn(
-        "flex w-full items-center gap-3",
+        "flex w-full items-start gap-3",
         isUser ? "justify-end" : ""
       )}
     >
