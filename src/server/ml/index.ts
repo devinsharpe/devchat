@@ -1,6 +1,6 @@
 import { env } from "~/env.mjs";
 import Replicate from "replicate";
-import { Conversation, Exchange } from "../db/schema/app";
+import type { Conversation, Exchange } from "../db/schema/app";
 
 type MODEL = "`${string}/${string}:${string}`";
 export const PREDICTION_MODEL =

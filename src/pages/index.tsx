@@ -1,5 +1,5 @@
 import { api } from "~/utils/api";
-import { Cog, MessagesSquare, List, Send } from "lucide-react";
+import { Cog, MessagesSquare, List } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import ChatDialog from "~/components/chatDialog";
 import Modal from "~/components/modal";
@@ -8,13 +8,19 @@ import ChatOptionsForms, {
 } from "~/components/forms/chatOptions";
 import { useRouter } from "next/router";
 
-// Create Conversation flow
-// - Additional options (system prompt, etc.)
+// Create Conversation flow ✅
+// - Additional options (system prompt, etc.) ✅
 // View & Open Previous Conversations Flow
 // - Save conversation ids in local storage
 // View Conversation Flow
 // - Infinite scroll with auto loading
-// - 1 trpc route for creating exchange and generating prediction
+// - 1 trpc route for creating exchange and generating prediction ✅
+// Title Generation flow using webhooks
+// Edit conversation options after initial message
+// Billing and rate limiting checks
+// Add caching for homepage conversation options (1/day)
+// Add response loading indicators to chat page
+// Clean up var/key names for consistency (message -> prompt, systemMessage -> systemPrompt, etc.)
 
 export default function Home() {
   // const hello = api.example.hello.useQuery({ text: "from tRPC" });
