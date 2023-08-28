@@ -8,23 +8,33 @@ import ChatOptionsForms, {
 } from "~/components/forms/chatOptions";
 import { useRouter } from "next/router";
 
+const HOME_PROMPTS = [
+  "Hi! Who are you?",
+  "Yeehaw! How are you and ol' bessy?",
+  "Hi LLaMA 2, who created you?",
+  "Hey, can you tell me a good dad joke?",
+  "I would love some background music right now. Do you have a couple of song recommendations?",
+];
+
 // Create Conversation flow ✅
 // - Additional options (system prompt, etc.) ✅
 // View & Open Previous Conversations Flow
-// - Save conversation ids in local storage
+// - Save conversation ids in local storage ✅
 // View Conversation Flow
 // - Infinite scroll with auto loading
 // - 1 trpc route for creating exchange and generating prediction ✅
 // Title Generation flow using webhooks
 // Edit conversation options after initial message
 // Billing and rate limiting checks
-// Add caching for homepage conversation options (1/day)
+// Add caching for homepage conversation options (1/day) ✅
 // Add response loading indicators to chat page
 // Clean up var/key names for consistency (message -> prompt, systemMessage -> systemPrompt, etc.)
 
 export default function Home() {
   // const hello = api.example.hello.useQuery({ text: "from tRPC" });
-  const createPrediction = api.predictions.create.useMutation();
+  const [index] = useState(Math.floor(Math.random() * 5));
+  const [isClient, setIsClient] = useState(false);
+  const homePrediction = api.predictions.homePrediction.useQuery({ index });
   const createConversation = api.conversations.create.useMutation();
   const [conversationOptions, setConversationOptions] = useState<ChatOptions>({
     message: "",
@@ -45,7 +55,7 @@ export default function Home() {
     {
       isLoading: false,
       sender: "user",
-      messages: ["Hello! Who are you?"],
+      messages: HOME_PROMPTS[index]!.split("! "),
     },
     {
       isLoading: true,
@@ -74,41 +84,43 @@ export default function Home() {
   }, [conversationOptions, createConversation, router]);
 
   useEffect(() => {
-    createPrediction
-      .mutateAsync({
-        prompt: "Hello! Who are you?",
-      })
-      .then((res) =>
-        setHistory([
-          ...history.slice(0, 1),
-          {
-            isLoading: false,
-            sender: "bot",
-            messages: res
-              .join("")
-              .split("!")
-              .filter((msg) => !!msg),
-          },
-        ])
-      )
-      .catch((err) => console.log(err));
-    //eslint-disable-next-line
+    setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    if (homePrediction.data) {
+      setHistory([
+        {
+          isLoading: false,
+          sender: "user",
+          messages: HOME_PROMPTS[index]!.split("! "),
+        },
+        {
+          isLoading: false,
+          sender: "bot",
+          messages: homePrediction.data.split("! "),
+        },
+      ]);
+    }
+  }, [homePrediction, setHistory, index]);
 
   return (
     <>
-      <section className="flex h-full w-full max-w-2xl flex-col gap-2 overflow-y-auto px-2 pb-16 pt-4">
-        {history.map((history, index) => (
-          <ChatDialog
-            dialogIndex={index}
-            isBot={history.sender === "bot"}
-            isUser={history.sender === "user"}
-            messages={history.messages}
-            isLoading={history.isLoading}
-            key={`dialog:${index}`}
-          />
-        ))}
-      </section>
+      {isClient && (
+        <section className="flex h-full w-full max-w-2xl flex-col gap-2 overflow-y-auto px-2 pb-16 pt-4">
+          {history.map((history, index) => (
+            <ChatDialog
+              dialogIndex={index}
+              isBot={history.sender === "bot"}
+              isUser={history.sender === "user"}
+              messages={history.messages}
+              isLoading={history.isLoading}
+              key={`dialog:${index}`}
+            />
+          ))}
+        </section>
+      )}
+
       <div className="fixed inset-x-0 bottom-0 flex justify-center gap-4  py-2 backdrop-blur-md">
         <button
           className="flex items-center gap-2 rounded-xl bg-gradient-to-br from-pink-200 via-purple-300 to-indigo-300 bg-size-200 bg-pos-0 px-6 py-3 font-semibold text-zinc-800 transition-all duration-500 hover:scale-105 hover:bg-pos-100"

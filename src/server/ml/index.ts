@@ -23,6 +23,14 @@ export const TITLE_SUMMARY_SYS_PROMPT = `
   [[ID]] **response**
   `;
 
+export const HOME_PROMPTS = [
+  "Hi! Who are you?",
+  "Yeehaw! How are you and ol' bessy?",
+  "Hi LLaMA 2, who created you?",
+  "Hey, can you tell me a good dad joke?",
+  "I would love some background music right now. Do you have a couple of song recommendations?",
+];
+
 export const replicate = new Replicate({
   auth: env.REPLICATE_TOKEN,
 });
